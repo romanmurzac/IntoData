@@ -1,0 +1,3 @@
+## Competency 9: Data manipulation and querying
+
+TBA ...

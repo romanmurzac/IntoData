@@ -1,0 +1,3 @@
+## Competency 11: Big Data and cloud computing
+
+TBA ...

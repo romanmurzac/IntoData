@@ -1,0 +1,3 @@
+## Competency 8: NoSQL modeling
+
+TBA ...

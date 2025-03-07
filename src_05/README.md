@@ -1,0 +1,3 @@
+## Competency 5: Data warehouse modeling
+
+TBA ...

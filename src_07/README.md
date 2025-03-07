@@ -1,0 +1,3 @@
+## Competency 7: Data governance and data quality
+
+TBA ...
