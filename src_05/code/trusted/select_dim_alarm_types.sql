@@ -1,0 +1,1 @@
+SELECT * FROM trusted.dim_alarm_types LIMIT 25;

@@ -1,4 +1,4 @@
-CREATE TABLE dim_time (
+CREATE TABLE staging.time (
   time_id SERIAL PRIMARY KEY,
   date DATE NOT NULL,
   month INT NOT NULL,

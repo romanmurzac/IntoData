@@ -1,8 +1,9 @@
-CREATE TABLE fact_alarm_events (
-  alarm_event_id SERIAL PRIMARY KEY,
+CREATE TABLE trusted.fact_incidents (
+  incident_id SERIAL PRIMARY KEY,
+  guard_id INT REFERENCES dim_guards(guard_id) ON DELETE CASCADE,
   client_id INT REFERENCES dim_clients(client_id) ON DELETE CASCADE,
   location_id INT REFERENCES dim_locations(location_id) ON DELETE CASCADE,
   time_id INT REFERENCES dim_time(time_id) ON DELETE CASCADE,
-  alarm_type_id INT REFERENCES dim_alarm_types(alarm_type_id) ON DELETE CASCADE,
-  triggered_by VARCHAR(50)
+  severity_level VARCHAR(20),
+  description TEXT
 );

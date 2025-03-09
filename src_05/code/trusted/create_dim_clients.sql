@@ -1,4 +1,4 @@
-CREATE TABLE dim_clients (
+CREATE TABLE trusted.dim_clients (
   client_id SERIAL PRIMARY KEY,
   client_name VARCHAR(100) NOT NULL,
   contract_start_date DATE,

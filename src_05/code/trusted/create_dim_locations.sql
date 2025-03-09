@@ -1,4 +1,4 @@
-CREATE TABLE dim_locations (
+CREATE TABLE trusted.dim_locations (
   location_id SERIAL PRIMARY KEY,
   address VARCHAR(255),
   city VARCHAR(100),

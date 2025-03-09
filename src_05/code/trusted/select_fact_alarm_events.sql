@@ -1,0 +1,1 @@
+SELECT * FROM trusted.fact_alarm_events LIMIT 25;

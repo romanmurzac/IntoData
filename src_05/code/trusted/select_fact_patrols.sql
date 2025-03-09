@@ -1,0 +1,1 @@
+SELECT * FROM trusted.fact_patrols LIMIT 25;

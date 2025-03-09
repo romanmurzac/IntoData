@@ -1,0 +1,1 @@
+SELECT * FROM trusted.fact_incidents LIMIT 25;
