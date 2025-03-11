@@ -1,4 +1,12 @@
-INSERT INTO staging.alarm_type (alarm_type_id, alarm_type, risk_level)
-SELECT DISTINCT device_id, event_type, 'Unknown'
+INSERT INTO staging.alarm_type (alarm_type, risk_level)
+SELECT DISTINCT
+  type, severity
+FROM raw.incident_report
+UNION ALL
+SELECT DISTINCT
+  event_type, raw_data->>'risk'
 FROM raw.iot_device
-WHERE device_id NOT IN (SELECT alarm_type_id FROM staging.alarm_type);
+UNION ALL
+SELECT DISTINCT
+  crime_type, severity_level
+FROM raw.external_crime;

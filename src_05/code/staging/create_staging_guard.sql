@@ -1,6 +1,6 @@
 CREATE TABLE staging.guard (
-  guard_id SERIAL PRIMARY KEY,
+  guard_id INT PRIMARY KEY,
   full_name VARCHAR(50) NOT NULL,
-  rank VARCHAR(20),
-  shift_schedule VARCHAR(20)
+  rank VARCHAR(50),
+  shift_schedule VARCHAR(50)
 );

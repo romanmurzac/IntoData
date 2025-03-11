@@ -1,4 +1,12 @@
-INSERT INTO staging.location (location_id, address, city, zone)
-SELECT DISTINCT location_id, 'Unknown', 'Unknown', 'Unknown'
-FROM raw.external_crime_data
-WHERE location_id NOT IN (SELECT location_id FROM staging.location);
+INSERT INTO staging.location (address, city, zone)
+SELECT DISTINCT address, city, zone
+FROM raw.employee_schedule
+UNION ALL
+SELECT DISTINCT address, city, zone
+FROM raw.incident_report
+UNION ALL
+SELECT DISTINCT address, city, zone
+FROM raw.external_crime
+UNION ALL
+SELECT DISTINCT address, city, zone
+FROM raw.iot_device;
