@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS raw.jobicy (
+  id INT,
+  url VARCHAR(255),
+  jobSlug VARCHAR(100),
+  jobTitle VARCHAR(100),
+  companyName VARCHAR(100),
+  companyLogo VARCHAR(255),
+  jobIndustry TEXT[],
+  jobType TEXT[],
+  jobGeo VARCHAR(50),
+  jobLevel VARCHAR(25),
+  jobExcerpt TEXT,
+  jobDescription TEXT,
+  pubDate TIMESTAMP,
+  annualSalaryMin INT,
+  annualSalaryMax INT,
+  salaryCurrency VARCHAR(3),
+  lastUpdate TIMESTAMP,
+  source VARCHAR(25),
+  ingested_ts TIMESTAMP
+);

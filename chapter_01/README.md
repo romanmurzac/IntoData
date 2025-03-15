@@ -4,7 +4,7 @@
 HiredCorp is a headhunting and workforce placement company that connects job seekers with employers. It operates by publishing job listings from its own contracts with companies and aggregating job postings from external sources.
 
 ### Business Requirements
-HiredComp's platform aggregates job postings from external sources (APIs) and provides insights into job trends, salaries, required skills, and hiring companies.
+HiredCorp's platform aggregates job postings from external sources (APIs) and provides insights into job trends, salaries, required skills, and hiring companies.
 
 #### Core Business Goals
 1. **Centralized Job Data** – Aggregate job postings from multiple PIs.
@@ -45,11 +45,53 @@ The main goal is to track hiring trends, job distribution, and market demand.
 | Growth Rate of Job Postings	| % change in job postings over time. |
 
 ## Warehouse Design
+There will be created a server and a database named `hiredcorp_db`. For the database creation process consult [Data Engineering Introduction - Transform data](https://github.com/romanmurzac/DrivenPath/tree/main/chapter_2#transform-data).
 
 ### Source
 The data sources for the company are:
 * [DevITjobs](https://devitjobs.com/api/jobsLight) --> Platform for job posting.
-* [Jobicy](https://jobicy.com/jobs-rss-feed) --> Platform for job posting.
+* [Jobicy](https://jobicy.com/jobs-rss-feed) --> Platform for remote job posting.
+
+In the `hiredcorp_db` database will be created a `raw` schema for *raw* layer. It will host two tables: `devitjobs` and `jobicy`. The data will be ingested as full load daily. There will be ingested all fields as they are with coresponding data types. The description for each ingested field can be found on the provider side.\
+**Note:** Please consult provider API for data details.
+
+### Staging
+In the `hiredcorp_db` database will be created a `staging` schema for *staging* layer. For the staging zone, a single unified staging `jobs` table will be designed that clean, standardize, and unify data from the two raw sources before moving it to the trusted zone. The staging schema will:
+* Normalize fields across both sources
+* Standardize data types and naming conventions
+* Handle missing or inconsistent data
+* Prepare for further transformation
+
+| Column Name | DescriptData Type | Description |
+| ------------| ----------------- | ----------- |
+| job_id | TEXT PRIMARY KEY | Unique identifier (Standardized)
+| job_url | VARCHAR(500) |  job URL
+| job_title | VARCHAR(255) | Unified job title
+| company_name | VARCHAR(255) | Unified company name
+| company_logo | (500) | Company logo URL
+|  job_industry | TEXT[] | Industry categories (if available)
+|  job_type | TEXT[]  | Job type (e.g., Full-time, Part-time, etc.)
+|  job_level | VARCHAR(50) | Seniority level
+|  job_description |  | Full job description
+|  job_excerpt | TEXT | Short job summary
+|  location | VARCHAR(255) | Standardized location (city/state/country)
+|  latitude | DECIMAL(11,8) | Latitude (if available)
+|  longitude | DECIMAL(11,8) | Longitude (if available)
+| remote_type | VARCHAR(50) | Remote type (e.g., "Remote", "Hybrid", "Onsite")
+| workplace | VARCHAR(50) | Workplace type (e.g., "Office", "Home-based", etc.)
+|  salary_min | INT | Minimum salary (if available)
+|  salary_max | INT | Maximum salary (if available)
+|  salary_currency | VARCHAR(3) | Currency (USD, EUR, etc.)
+|  company_size | VARCHAR(50) | Company size (e.g., "11-50 employees")
+|  company_type | VARCHAR(50) | Startup, Corporation, etc.
+| tech_stack | TEXT[] | Technologies required for the job
+| filter_tags | TEXT[] | Extra filtering tags
+| has_visa_sponsorship | BOOLEAN | Visa sponsorship availability
+|  language_requirements | TEXT[] | Required languages for the job
+| published_at | TIMESTAMP | Date job was published
+|  last_update | TIMESTAMP | Last update timestamp
+|  source | VARCHAR(50) | Source of the job data
+| ingested_ts | TIMESTAMP | Ingestion timestamp
 
 ### Bus Matrix
 The Bus Matrix helps identify the key dimensions and facts required for reporting.
@@ -62,7 +104,7 @@ The Bus Matrix helps identify the key dimensions and facts required for reportin
 | Company Hiring Trends | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ | ✗ |
 
 ### Dimensional Data Model
-The dimensional model follows a Star Schema, optimized for analytics.
+The dimensional model follows a Star Schema, optimized for analytics and for this will be created `trusted` layer in the `hiredcorp_db` database.
 
 #### Fact Tables
 | Fact Tables |	Description |
