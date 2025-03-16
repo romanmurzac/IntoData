@@ -1,0 +1,1 @@
+SELECT * FROM trusted.fact_technology_demand LIMIT 10;

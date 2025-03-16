@@ -1,0 +1,1 @@
+SELECT * FROM trusted.fact_company_hiring LIMIT 10;

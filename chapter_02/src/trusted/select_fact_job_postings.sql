@@ -1,0 +1,1 @@
+SELECT * FROM trusted.fact_job_postings LIMIT 10;
