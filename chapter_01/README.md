@@ -49,10 +49,56 @@ There will be created a server and a database named `hiredcorp_db`. For the data
 
 ### Source
 The data sources for the company are:
+* HiredCorp --> own platform data; vacancies and canditates posting.
 * [DevITjobs](https://devitjobs.com/api/jobsLight) --> Platform for job posting.
 * [Jobicy](https://jobicy.com/jobs-rss-feed) --> Platform for remote job posting.
 
-In the `hiredcorp_db` database will be created a `raw` schema for *raw* layer. It will host two tables: `devitjobs` and `jobicy`. The data will be ingested as full load daily. There will be ingested all fields as they are with coresponding data types. The description for each ingested field can be found on the provider side.\
+In the `hiredcorp_db` database will be created a `raw` schema for *raw* layer. It will host four tables: `candidate`, `hiredcorp`, `devitjobs` and `jobicy`.
+
+#### HireCorp source
+For the own data there will be streaming ingestion. There will two tables:
+* candidate --> candidates CVs.
+* hiredcorp --> job posting from the partners.
+
+**`candidate`**
+* Stores candidate information
+* Implemented SCD Type 2 for tracking candidate history
+
+| Column Name | Data Type | Description |
+| ------------| ----------------- | ----------- |
+| candidate_id | INT PRIMARY KEY | Unique identifier (Standardized) |
+| first_name | VARCHAR(50) | First name |
+| last_name | VARCHAR(50) | Last name |
+| age | INT | Age |
+| gender | VARCHAR(50) | Gender |
+| experience | INT | Years of experience |
+| prefered_post | VARCHAR(50) | Position name |
+| technologies | TEXT[] | Technologies |
+| job_type | VARCHAR(50) | Job type |
+| location | VARCHAR(50) | Location |
+| is_available | BOOLEAN | If is available |
+| available_from | TIMESTAMP | When is available |
+| min_salary | INT | Minimum desired salary |
+| created_at | TIMESTAMP | When the profile was created |
+
+**`hiredcorp`**
+* Stores jobs information
+
+| Column Name | Data Type | Description |
+| ------------| ----------------- | ----------- |
+| job_id | INT PRIMARY KEY | Unique identifier (Standardized) |
+| source | VARCHAR(25) | Source of the job data |
+| company_name | VARCHAR(255) | Unified company name |
+| job_title | VARCHAR(255) | Unified job title |
+| job_url | VARCHAR(500) |  Job URL |
+| address | VARCHAR(255) | Address where the job is available |
+| job_type | TEXT[]  | Job type (e.g., Full-time, Part-time) |
+| min_salary | INT | Minimum salary |
+| skills | TEXT[] | Technologies required for the job |
+| posted_at | TIMESTAMP | Date job was published |
+
+#### External source
+For the external sources the data will be ingested as full load daily. There will be ingested all fields as they are with coresponding data types. The description for each ingested field can be found on the provider side.\
 **Note:** Please consult provider API for data details.
 
 ### Staging
@@ -62,36 +108,48 @@ In the `hiredcorp_db` database will be created a `staging` schema for *staging* 
 * Handle missing or inconsistent data
 * Prepare for further transformation
 
-| Column Name | DescriptData Type | Description |
+| Column Name | Data Type | Description |
 | ------------| ----------------- | ----------- |
-| job_id | TEXT PRIMARY KEY | Unique identifier (Standardized)
+| staging_id | INT PRIMARY KEY | Unique identifier (Standardized)
+| job_id | TEXT | Unique identifier for a job
+| source | VARCHAR(25) | Source of the job data
 | job_url | VARCHAR(500) |  job URL
 | job_title | VARCHAR(255) | Unified job title
 | company_name | VARCHAR(255) | Unified company name
 | company_logo | (500) | Company logo URL
-|  job_industry | TEXT[] | Industry categories (if available)
-|  job_type | TEXT[]  | Job type (e.g., Full-time, Part-time, etc.)
-|  job_level | VARCHAR(50) | Seniority level
-|  job_description |  | Full job description
-|  job_excerpt | TEXT | Short job summary
-|  location | VARCHAR(255) | Standardized location (city/state/country)
-|  latitude | DECIMAL(11,8) | Latitude (if available)
-|  longitude | DECIMAL(11,8) | Longitude (if available)
+| job_industry | TEXT[] | Industry categories (if available)
+| job_type | TEXT[]  | Job type (e.g., Full-time, Part-time, etc.)
+| job_level | VARCHAR(50) | Seniority level
+| job_description | TEXT | Full job description
+| job_excerpt | TEXT | Short job summary
+| is_partner | BOOLEAN | Flag if is a partner
+| is_paused | BOOLEAN | Flag if job is paused
+| location | VARCHAR(255) | Standardized location (city/state/country)
+| latitude | DECIMAL(11,8) | Latitude (if available)
+| longitude | DECIMAL(11,8) | Longitude (if available)
+| city_category | VARCHAR(50) | City where the job is available
+| state_category | VARCHAR(50) | State where the job is available
+| address | VARCHAR(255) | Address where the job is available
+| postal_code | VARCHAR(50) | Postal code of the address
 | remote_type | VARCHAR(50) | Remote type (e.g., "Remote", "Hybrid", "Onsite")
 | workplace | VARCHAR(50) | Workplace type (e.g., "Office", "Home-based", etc.)
-|  salary_min | INT | Minimum salary (if available)
-|  salary_max | INT | Maximum salary (if available)
-|  salary_currency | VARCHAR(3) | Currency (USD, EUR, etc.)
-|  company_size | VARCHAR(50) | Company size (e.g., "11-50 employees")
-|  company_type | VARCHAR(50) | Startup, Corporation, etc.
+| candidate_contact_way | VARCHAR(50) | How to contact the company
+| redirect_job_url | VARCHAR(500) | The URL to the job post
+| salary_min | INT | Minimum salary (if available)
+| salary_max | INT | Maximum salary (if available)
+| salary_currency | VARCHAR(3) | Currency (USD, EUR, etc.)
+| perk_keys | TEXT[] | Key words of the job
+| company_size | VARCHAR(50) | Company size (e.g., "11-50 employees")
+| company_type | VARCHAR(50) | Startup, Corporation, etc.
+| tech_category | VARCHAR(50) | Category where the job fitting
 | tech_stack | TEXT[] | Technologies required for the job
 | filter_tags | TEXT[] | Extra filtering tags
 | has_visa_sponsorship | BOOLEAN | Visa sponsorship availability
-|  language_requirements | TEXT[] | Required languages for the job
+| language_requirements | TEXT[] | Required languages for the job
 | published_at | TIMESTAMP | Date job was published
-|  last_update | TIMESTAMP | Last update timestamp
-|  source | VARCHAR(50) | Source of the job data
+| last_update | TIMESTAMP | Last update timestamp
 | ingested_ts | TIMESTAMP | Ingestion timestamp
+| staging_ts | TIMESTAMP | Staging timestamp
 
 ### Bus Matrix
 The Bus Matrix helps identify the key dimensions and facts required for reporting.
@@ -122,7 +180,8 @@ The dimensional model follows a Star Schema, optimized for analytics and for thi
 
 | Column Name | Data Type | FK Reference | Description | Availability in API |
 | ----------- | --------- | ------------ | ----------- | ------------------- |
-| job_id | BIGINT PRIMARY KEY |	- | Unique job identifier | jobId |
+| job_post_id | BIGINT PRIMARY KEY | - | Unique job identifier | jobId |
+| staging_job_id | INT staging(job_id) |	- | Unique job identifier | jobId |
 | date_id | INT | dim_date(date_id) | Job posting date | publishedAt |
 | company_id | INT | dim_company(company_id) | Hiring company| company.name |
 | location_id | INT |	dim_location(location_id) | Job location| location |
@@ -141,13 +200,12 @@ The dimensional model follows a Star Schema, optimized for analytics and for thi
 | Column Name | Data Type | FK Reference | Description | Availability in API |
 | ----------- | --------- | ------------ | ----------- | ------------------- |
 | salary_fact_id	| BIGINT PRIMARY KEY	| -	| Unique row identifier	| - |
+| staging_job_id | INT | staging(job_id) | Unique job identifier | jobId |
 | date_id	| INT	| dim_date(date_id)	| Salary date | publishedAt |
 | job_title	| VARCHAR(255)	| -	| Job role | title |
 | company_id	| INT	| dim_company(company_id)	| Company hiring for role | company.name |
 | location_id	| INT	| dim_location(location_id)	| Job location| location |
-| min_salary	| DECIMAL(10,2)	| -	| Minimum salary	| salaryMin |
-| max_salary	| DECIMAL(10,2)	| -	| Maximum salary	| salaryMax |
-| currency	| VARCHAR(10)	| -	| Salary currency	| currency |
+| salary_id	| INT	| dim_salary(salary_id)	| Unique salary identifier | - |
 
 **`fact_technology_demand`**
 * Tracks job demand for each technology.
@@ -202,6 +260,8 @@ The dimensional model follows a Star Schema, optimized for analytics and for thi
 | ----------- | --------- | ----------- | ------------ |
 | company_id	| INT PRIMARY KEY	| Surrogate key	| - |
 | company_name	| VARCHAR(255)	| Name of the company	| company.name |
+| source_system | VARCHAR(25) | Source of the record | source |
+| ingested_ts | TIMESTAMP | Time when record was ingested | - |
 
 **`dim_location`**
 * Stores job location details.
@@ -209,8 +269,14 @@ The dimensional model follows a Star Schema, optimized for analytics and for thi
 | Column Name | Data Type | Description | Availability |
 | ----------- | --------- | ----------- | ------------ |
 | location_id	| INT PRIMARY KEY	| Surrogate key	| - |
-| city	| VARCHAR(255)	| City name	| location |
-| country	| VARCHAR(100)	| Country name	| extracted |
+| city_category	| VARCHAR(50)	| City name	| location |
+| state_category	| VARCHAR(50)	| State name | extracted |
+| location | VARCHAR(255) | Location | location |
+| latitude | DECIMAL(11,8) | Latitude | latitude |
+| longitude | DECIMAL(11,8) | Longitute | longitude |
+| address | VARCHAR(255) | Address | address |
+| postal_code | VARCHAR(50) | Postal code | postal_code |
+| remote_type | VARCHAR(50) | Remote type | remote_type |
 
 **`dim_job_type`**
 * Job type classification.
@@ -218,7 +284,7 @@ The dimensional model follows a Star Schema, optimized for analytics and for thi
 | Column Name | Data Type | Description | Availability |
 | ----------- | --------- | ----------- | ------------ |
 | job_type_id	| INT PRIMARY KEY	| Surrogate key	| - |
-| job_type	| VARCHAR(50)	| Full-time, part-time, contract | employmentType |
+| job_type	| VARCHAR(255)	| Full-time, part-time, contract | employmentType |
 
 **`dim_salary`**
 * Salary classification.
@@ -226,9 +292,9 @@ The dimensional model follows a Star Schema, optimized for analytics and for thi
 | Column Name | Data Type | Description | Availability |
 | ----------- | --------- | ----------- | ------------ |
 | salary_id	| INT PRIMARY KEY	| Surrogate key	| - |
-| min_salary	| DECIMAL(10,2)	| Minimum salary	| salaryMin |
-| max_salary	| DECIMAL(10,2)	| Maximum salary	| salaryMax |
-| currency	| VARCHAR(10)	| Currency	| currency |
+| min_salary	| INT	| Minimum salary	| salaryMin |
+| max_salary	| INT	| Maximum salary	| salaryMax |
+| currency	| VARCHAR(3)	| Currency	| currency |
 
 **`dim_remote_type`**
 * Remote vs. Onsite.
@@ -244,24 +310,24 @@ The dimensional model follows a Star Schema, optimized for analytics and for thi
 | Column Name | Data Type | Description | Availability |
 | ----------- | --------- | ----------- | ------------ |
 | technology_id	| INT PRIMARY KEY	| Surrogate key	| - |
-| technology_name	| VARCHAR(255)	| Tech name	| tags |
+| technology_name	| VARCHAR(50)	| Tech name	| tags |
+
+#### Entity Relatonship Diagram
+![Image 1](../media/image_1.1.PNG)
 
 ### Physical Model
 
-#### Indexing
-* Primary Keys:
-   * fact_job_postings(job_id)
-   * fact_technology_demand(tech_demand_id)
-* Indexes:
-   * dim_company(company_name) for company lookups.
-   * dim_location(city, country) for location-based searches.
-   * dim_technology(technology_name) for job skill analysis.
-
 #### Partitioning
-* Fact Tables Partitioned by *date_id*
+* Fact table `fact_job_postings` partitioned by *date_id*
+
+#### Indexing
+   * fact_job_postings_partitioned(job_id)
+   * fact_job_postings_partitioned(company_id)
+   * fact_job_postings_partitioned(location_id)
+   * fact_job_postings_partitioned(technology_id)   
 
 #### Data Quality
 * Ensure non-null key fields
 * Ensure salary consistency (currency in USD)
 * Remove duplicate jobs (same job ID)
-* Validate job postings have descriptions
+* Validate job postings have title

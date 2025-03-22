@@ -5,7 +5,7 @@ import requests
 DB_PARAMS = {
     "dbname": "intodata_db",
     "user": "postgres",
-    "password": "Zaqwsx!32",
+    "password": "12345",
     "host": "localhost",
     "port": "5432",
 }
@@ -16,7 +16,6 @@ JOBICY_API = "https://jobicy.com/api/v2/remote-jobs"
 
 # Connect to PostgreSQL.
 def get_db_connection():
-    print("Connecting to the PostgreSQL database...")
     return psycopg2.connect(**DB_PARAMS)
 
 
@@ -94,15 +93,14 @@ def ingest_data():
             insert_job_data(cursor, job, update_at, "Jobicy")
 
         conn.commit()
-        print("Data ingestion successful!")
     except Exception as e:
-        print("Error:", e)
         conn.rollback()
     finally:
         cursor.close()
         conn.close()
 
 
+# Run the ingestion.
 if __name__ == "__main__":
     # Run ingestion.
     ingest_data()
