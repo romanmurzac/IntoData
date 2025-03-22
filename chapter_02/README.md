@@ -1,7 +1,7 @@
 # Batch processing
 
 ## Source
-In current phase the HiredCorp is using data from two partners and ingesting data from  their APIs named **Source 1** and **Source 2**.
+In current phase the HiredCorp is using data from two partners and ingesting data from their APIs named **Source 1** and **Source 2**.
 
 ### Source 1
 Source 1 is [Jobicy](https://jobicy.com/) a Remote Jobs company.

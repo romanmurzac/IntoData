@@ -16,7 +16,7 @@ Description `To be added ...`
 [Chapter 2 - Batch processing](chapter_02)\
 Description `To be added ...`
 
-[Chapter 3 - Streaming processing](chapter_02)\
+[Chapter 3 - Streaming processing](chapter_03)\
 Description `To be added ...`
 
 ## Scenario

@@ -79,7 +79,9 @@ For the own data there will be streaming ingestion. There will two tables:
 | is_available | BOOLEAN | If is available |
 | available_from | TIMESTAMP | When is available |
 | min_salary | INT | Minimum desired salary |
+| source | VARCHAR(25) | Source from where data are ingested |
 | created_at | TIMESTAMP | When the profile was created |
+| ingested_ts | TIMESTAMP | When data was ingested |
 
 **`hiredcorp`**
 * Stores jobs information
@@ -96,6 +98,7 @@ For the own data there will be streaming ingestion. There will two tables:
 | min_salary | INT | Minimum salary |
 | skills | TEXT[] | Technologies required for the job |
 | posted_at | TIMESTAMP | Date job was published |
+| ingested_ts | TIMESTAMP | When data was ingested |
 
 #### External source
 For the external sources the data will be ingested as full load daily. There will be ingested all fields as they are with coresponding data types. The description for each ingested field can be found on the provider side.\
