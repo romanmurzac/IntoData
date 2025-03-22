@@ -1,0 +1,1 @@
+DELETE FROM staging.jobs WHERE job_title IS NULL OR LENGTH(TRIM(job_title)) = 0;

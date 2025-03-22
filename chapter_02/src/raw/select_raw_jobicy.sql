@@ -1,0 +1,1 @@
+SELECT * FROM raw.jobicy LIMIT 10;

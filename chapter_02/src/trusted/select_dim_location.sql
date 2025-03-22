@@ -1,0 +1,1 @@
+SELECT * FROM trusted.dim_location LIMIT 10;
