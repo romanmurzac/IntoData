@@ -276,3 +276,10 @@ For indexes creation use the SQL queries from `./index/create_index.sql`. All th
 
 ### Quality check
 All queries from `./quality` can be used for quality check, to avoid redundancy use only `./quality/set_non_null_key.sql`.
+
+## Slow Changing Dimension
+For `dim_company` is implemented Slow Changing Dimesnion Type 2.\
+First, update the table schema by adding three new fields: *valid_from*, *valid_to*, and *is_current*. For this operation use the query from `./dimension/update_create_dim_company.sql`.\
+Second, update data transformation process. First stage is to enable safe transaction handling. Second stage is to close old records if changes detected. Third stage is to insert new records if changed or new. Fourth stage is to commit the changes. For this operation use the query from `./dimension/update_insert_dim_company.sql`.\
+Third, update the select statement to select active records. For this operation use the query from `./dimension/update_select_dim_company.sql`.\
+![Image 2.19](../media/image_2.19.PNG)
