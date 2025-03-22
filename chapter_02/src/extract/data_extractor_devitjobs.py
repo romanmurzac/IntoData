@@ -3,7 +3,7 @@ import requests
 
 # Database connection details.
 DB_PARAMS = {
-    "dbname": "intodata_db",
+    "dbname": "hiredcorp_db",
     "user": "postgres",
     "password": "12345",
     "host": "localhost",

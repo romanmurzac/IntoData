@@ -45,7 +45,7 @@ The main goal is to track hiring trends, job distribution, and market demand.
 | Growth Rate of Job Postings	| % change in job postings over time. |
 
 ## Warehouse Design
-There will be created a server and a database named `hiredcorp_db`. For the database creation process consult [Data Engineering Introduction - Transform data](https://github.com/romanmurzac/DrivenPath/tree/main/chapter_2#transform-data).
+There will be created a server `HiredCorp` and a database named `hiredcorp_db`. For the database creation process consult [Data Engineering Introduction - Transform data](https://github.com/romanmurzac/DrivenPath/tree/main/chapter_2#transform-data).
 
 ### Source
 The data sources for the company are:
@@ -313,7 +313,14 @@ The dimensional model follows a Star Schema, optimized for analytics and for thi
 | technology_name	| VARCHAR(50)	| Tech name	| tags |
 
 #### Entity Relatonship Diagram
-![Image 1](../media/image_1.1.PNG)
+For the ERD for database use the option from PgAdmin 4, on database choose option `ERD for Database` or use the file from `chapter_01/src/doc/entity_relationship_diagram.drawio`.\
+![Image 1.1](../media/image_1.1.PNG)
+
+#### Database schemas
+To create the `raw` schema use the query from the file `chapter_01/src/layer/raw.sql`.\
+To create the `staging` schema use the query from the file `chapter_01/src/layer/staging.sql`.\
+To create the `trusted` schema use the query from the file `chapter_01/src/layer/trusted.sql`.\
+![Image 1.2](../media/image_1.2.PNG)
 
 ### Physical Model
 
