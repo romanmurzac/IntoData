@@ -1,0 +1,1 @@
+CALL raw.rollback_candidate(1);

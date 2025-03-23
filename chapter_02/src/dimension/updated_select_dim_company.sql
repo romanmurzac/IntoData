@@ -1,0 +1,1 @@
+SELECT * FROM trusted.dim_company WHERE is_valid = True LIMIT 10;

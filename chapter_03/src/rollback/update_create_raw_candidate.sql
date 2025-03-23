@@ -1,0 +1,3 @@
+ALTER TABLE raw.candidate 
+ADD COLUMN valid_from TIMESTAMP DEFAULT NOW(),
+ADD COLUMN valid_to TIMESTAMP;
