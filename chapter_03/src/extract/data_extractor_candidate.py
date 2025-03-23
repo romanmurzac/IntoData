@@ -8,7 +8,7 @@ import time
 DB_PARAMS = {
     "dbname": "hiredcorp_db",
     "user": "postgres",
-    "password": "12345",
+    "password": "Zaqwsx!32",
     "host": "localhost",
     "port": "5432",
 }
@@ -16,55 +16,54 @@ DB_PARAMS = {
 
 # Connect to PostgreSQL.
 def get_db_connection():
-    print("Connecting to the PostgreSQL database...")
     return psycopg2.connect(**DB_PARAMS)
 
 
 # Insert job data into raw table.
 def insert_job_data(cursor, job_data, source):
-    print("Inserting job data into raw table...")
-    sql = """
-        INSERT INTO raw.candidate (
-        candidate_id,
-        first_name,
-        last_name
-        age,
-        gender,
-        experience,
-        prefered_post,
-        technologies,
-        job_type,
-        location,
-        is_available,
-        available_from,
-        min_salary,
-        created_at,
-        source,
-        ingested_ts
-        ) VALUES (
-        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-        %s, %s, %s, CURRENT_TIMESTAMP, %s, CURRENT_TIMESTAMP
-        );
-    """
-    cursor.execute(
-        sql,
-        (
-            job_data.get("first_name"),
-            job_data.get("last_name"),
-            job_data.get("age"),
-            job_data.get("gender"),
-            job_data.get("experience"),
-            job_data.get("prefered_post"),
-            job_data.get("technologies"),
-            job_data.get("job_type"),
-            job_data.get("location"),
-            job_data.get("is_available"),
-
-            job_data.get("min_salary"),
+    try:
+        sql = """
+            INSERT INTO raw.candidate (
+            first_name,
+            last_name,
+            age,
+            gender,
+            experience,
+            prefered_post,
+            technologies,
+            job_type,
+            location,
+            is_available,
+            available_from,
+            min_salary,
+            created_at,
             source,
-        ),
-    )
-    print("Job data inserted successfully.")
+            ingested_ts,
+            valid_from
+            ) VALUES (
+            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+            CURRENT_TIMESTAMP, %s, CURRENT_TIMESTAMP, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+            );
+        """
+        cursor.execute(
+            sql,
+            (
+                job_data.get("first_name"),
+                job_data.get("last_name"),
+                int(job_data.get("age")),
+                job_data.get("gender"),
+                int(job_data.get("experience")),
+                job_data.get("prefered_post"),
+                [job_data.get("technologies")],
+                job_data.get("job_type"),
+                job_data.get("location"),
+                job_data.get("is_available"),
+                int(job_data.get("min_salary")),
+                source,
+            ),
+        )
+    except Exception as e:
+        raise e
 
 
 # Fetch jobs from HiredCorp API.
@@ -87,7 +86,6 @@ def fetch_candidate():
         "is_available": fake.random_element(elements=("Yes", "No")),
         "min_salary": fake.random_int(min=10000, max=250000),
     }
-    print("Candidate data fetched successfully: ", candidate)
     return candidate
 
 
@@ -111,5 +109,4 @@ def ingest_data():
 
 # Run the ingestion.
 if __name__ == "__main__":
-    # Run ingestion.
     ingest_data()
